@@ -119,6 +119,9 @@ OPT1_NEW = OPT1_OLD + ("\n"
     "Gui, Add, Text, x+5, (formato HHMM)")
 
 CHANGELOG_NEW = ("Gui, 3:Add, Edit, x12 y89 w320 h230 +ReadOnly, "
+    "Versão 5.3:`n"
+    "• Prática desportiva padrão às 08:00-09:00 (manhã) e com horário fixo "
+    "(não sofre variação aleatória)`n`n"
     "Versão 5.2:`n"
     "• Entrada do expediente nunca antes de um mínimo (padrão 10:00)`n"
     "• Total diário padrão de 09:01 a 09:11 (sempre acima de 9h)`n`n"
@@ -243,7 +246,7 @@ continue
 novo := MinParaHm(e1) . MinParaHm(s1) . MinParaHm(e2) . MinParaHm(s2)
 if (StrLen(s) = 16)
 return novo
-Random, d3, % 0 - j, % j
+d3 := 0
 e3 := HmParaMin(SubStr(s, 17, 4)) + d3
 s3 := HmParaMin(SubStr(s, 21, 4)) + d3
 if (e3 < 0 or s3 > 1439)
@@ -329,6 +332,15 @@ def main(src_path, dst_path):
          "Gui, 2:Add, Edit, w60 vEntradaC2 number limit4, 1430"),
         ("Gui, 2:Add, Edit, x+40 w60 vSaidaC2 number limit4, 1730",
          "Gui, 2:Add, Edit, x+40 w60 vSaidaC2 number limit4, 1830"),
+        # desporto de manhã (08:00-09:00) nos três padrões
+        ("Gui, Add, Edit, w60 vDesportoE number limit4, 2000",
+         "Gui, Add, Edit, w60 vDesportoE number limit4, 0800"),
+        ("Gui, Add, Edit, x+%const% w60 vDesportoS number limit4, 2100",
+         "Gui, Add, Edit, x+%const% w60 vDesportoS number limit4, 0900"),
+        ("Gui, 2:Add, Edit, w60 vEntradaC3 number limit4, 0730",
+         "Gui, 2:Add, Edit, w60 vEntradaC3 number limit4, 0800"),
+        ("Gui, 2:Add, Edit, x+40 w60 vSaidaC3 number limit4, 0830",
+         "Gui, 2:Add, Edit, x+40 w60 vSaidaC3 number limit4, 0900"),
     ]:
         text = sub(text, old, new, 1)
     # 10e. validacao das entradas do DIA 2/3 contra o minimo
@@ -351,9 +363,9 @@ def main(src_path, dst_path):
                "a qualquer instante.",
                "MsgInicio()", 2)
     # 11. versao
-    text = sub(text, "&Versão_4.2", "&Versão_5.2", 1)
-    text = sub(text, "ButtonVersão_4.2:", "ButtonVersão_5.2:", 1)
-    text = sub(text, "v. 4.2.0", "v. 5.2.0", 1)
+    text = sub(text, "&Versão_4.2", "&Versão_5.3", 1)
+    text = sub(text, "ButtonVersão_4.2:", "ButtonVersão_5.3:", 1)
+    text = sub(text, "v. 4.2.0", "v. 5.3.0", 1)
     # 12. changelog
     text = re.sub(r"Gui, 3:Add, Edit, x12 y89 w320 h230 \+ReadOnly, [^\n]*",
                   lambda _: CHANGELOG_NEW, text, count=1)

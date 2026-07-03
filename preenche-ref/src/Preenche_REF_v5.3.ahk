@@ -16,7 +16,7 @@ Gui, Color,
 Gui +LastFound
 WinSet, TransColor, FFFFA7
 Gui, Font, underline
-Gui, Add, Button, x+260 y+3 w90 h24 hwndIcon6 , &Versão_5.2
+Gui, Add, Button, x+260 y+3 w90 h24 hwndIcon6 , &Versão_5.3
 Gui, Font, norm
 Gui, Add, Text, xm vTexto, • Somente executar no navegador: Google Chrome e Mozilla Firefox
 Gui, Add, Text,xm , • Final de semana e feriados não serão preenchidos (serão pulados).
@@ -35,8 +35,8 @@ Gui, Add, Checkbox, xp-170 yp+30 vSteamAPIToggle %SteamApiToggle% gBOX, Inserir 
 Gui, Add, Edit, Disabled xp  yp+20 w320 vObs limit200,
 Gui, Add, GroupBox, xm r5 w350, Horário da prática desportiva
 Gui, Add, Text, xp+%const% yp+15, Desporto entrada / Desporto saída
-Gui, Add, Edit, w60 vDesportoE number limit4, 2000
-Gui, Add, Edit, x+%const% w60 vDesportoS number limit4, 2100
+Gui, Add, Edit, w60 vDesportoE number limit4, 0800
+Gui, Add, Edit, x+%const% w60 vDesportoS number limit4, 0900
 Gui, Add, Checkbox, xp-170 yp+30 vSteamAPIToggle2 %SteamApiToggle2% gBOX2, Inserir '&Observação / Justificativa'
 Gui, Add, Edit, Disabled xp  yp+20 w320 vObs2 limit200,
 Gui, Add, Text, xm, Insira a data inicial e a final, com números e barras (ex. 27/06/2020):
@@ -90,18 +90,18 @@ Gui, 2:Add, Edit, w60 vEntradaC2 number limit4, 1430
 Gui, 2:Add, Edit, x+40 w60 vSaidaC2 number limit4, 1830
 Gui, 2:Add, GroupBox, xm r3 w200, Horário da prática desportiva
 Gui, 2:Add, Text, xp+10 yp+15 , Desporto entrada / Desporto saída
-Gui, 2:Add, Edit, w60 vEntradaC3 number limit4, 0730
-Gui, 2:Add, Edit, x+40 w60 vSaidaC3 number limit4, 0830
+Gui, 2:Add, Edit, w60 vEntradaC3 number limit4, 0800
+Gui, 2:Add, Edit, x+40 w60 vSaidaC3 number limit4, 0900
 Gui, 2:Add, Button, xm w85 h40 Default gButtonAplicar hwndIcon3, &Aplicar
 Gui, 2:Add, Button, x+15 w85 h40 gButtonEncerrar hwndIcon4, &Encerrar
 GuiButtonIcon(Icon3, "shell32.dll", 138, "s32 a0 l2")
 GuiButtonIcon(Icon4, "shell32.dll", 110, "s32 a0 l2")
 GuiButtonIcon(Icon5, "shell32.dll", 239, "s32 a0 l2")
-Gui, 3:Add, Edit, x12 y89 w320 h230 +ReadOnly, Versão 5.2:`n• Entrada do expediente nunca antes de um mínimo (padrão 10:00)`n• Total diário padrão de 09:01 a 09:11 (sempre acima de 9h)`n`nVersão 5.1:`n• Sorteio do total de horas de cada dia — nunca em hora exata nem repetindo o dia anterior; a saída fecha o total`n`nVersão 5.0:`n• Feriados móveis calculados para qualquer ano (antes: lista fixa até 2025)`n• Variação aleatória da posição dos horários`n• Progresso (dia X de Y) e correções de texto`n`nVersões anteriores: ver README do projeto
+Gui, 3:Add, Edit, x12 y89 w320 h230 +ReadOnly, Versão 5.3:`n• Prática desportiva padrão às 08:00-09:00 (manhã) e com horário fixo (não sofre variação aleatória)`n`nVersão 5.2:`n• Entrada do expediente nunca antes de um mínimo (padrão 10:00)`n• Total diário padrão de 09:01 a 09:11 (sempre acima de 9h)`n`nVersão 5.1:`n• Sorteio do total de horas de cada dia — nunca em hora exata nem repetindo o dia anterior; a saída fecha o total`n`nVersão 5.0:`n• Feriados móveis calculados para qualquer ano (antes: lista fixa até 2025)`n• Variação aleatória da posição dos horários`n• Progresso (dia X de Y) e correções de texto`n`nVersões anteriores: ver README do projeto
 Gui, 3:Add, Button, x232 y329 w100 h30 gOK Default, &OK
 Gui, 3:Font, Bold
 Gui, 3:Add, Text, x92 y9 w140 h20 , Preenche REF
-Gui, 3:Add, Text, x92 y29 w140 h20 , v. 5.2.0
+Gui, 3:Add, Text, x92 y29 w140 h20 , v. 5.3.0
 Gui, 3:Font
 SysIcons := A_WinDir . "\system32\SHELL32.dll"
 Gui, 3:Add, Picture, x12 y9 w70 h70 Icon21, %SysIcons%
@@ -212,7 +212,7 @@ GuiControl, Hide, Obs2
 }
 }
 return
-ButtonVersão_5.2:
+ButtonVersão_5.3:
 {
 Gui, 3:Show, Center w348 h370, Preenche REF - Versões
 permiteMsg := false
@@ -1683,7 +1683,7 @@ continue
 novo := MinParaHm(e1) . MinParaHm(s1) . MinParaHm(e2) . MinParaHm(s2)
 if (StrLen(s) = 16)
 return novo
-Random, d3, % 0 - j, % j
+d3 := 0
 e3 := HmParaMin(SubStr(s, 17, 4)) + d3
 s3 := HmParaMin(SubStr(s, 21, 4)) + d3
 if (e3 < 0 or s3 > 1439)
