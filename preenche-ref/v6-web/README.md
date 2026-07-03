@@ -40,29 +40,47 @@ enviado — é seguro. Para analisar outro mês, navegue até ele e cole de novo
 > Dica: se aparecer um aviso pedindo para digitar `allow pasting` antes de
 > colar, digite isso e tecle Enter — é uma proteção do navegador, normal.
 
-## Parte 2 — Preenchedor automático (a fazer) ⏳
+## Parte 2a — Sugestor de horários (pronta) ✅
 
-Falta a parte que **preenche** os dias amarelos sozinha. Para construí-la com
-segurança eu preciso ver o formulário de lançamento — que **não** está na
-página que você salvou, porque ele só é carregado quando você **clica em um
-dia** (o sistema busca no servidor naquele momento).
+[`sugere_horarios_ref.js`](sugere_horarios_ref.js) roda dentro da página e,
+para cada dia útil ainda vazio, **mostra numa tabela os horários a lançar**,
+seguindo as mesmas regras da v5.2: entrada nunca antes de 10:00, total diário
+entre 09:01 e 09:11 (nunca em hora exata nem repetindo o dia anterior),
+pequena variação de posição e 1h de desporto contando no total. Não preenche
+nem envia nada — você digita, por enquanto. As opções ficam no bloco `CONFIG`
+no topo do arquivo. Há um botão **"Sortear de novo"** para gerar outra
+combinação.
 
-O sistema é um JSF/RichFaces com identificadores de campo gerados
-automaticamente (ex.: `formInclusao:j_id652`), que mudam a cada sessão — por
-isso o preenchedor terá que localizar os campos pela estrutura, não por um
-número fixo. Para isso, preciso de **duas capturas**:
+Testado: 10.000 dias simulados sem violar nenhuma regra, e rodado contra a
+página real (março/2026), gerando os 8 dias vazios corretos.
 
-1. Abra um dia **vazio** clicando nele (abre a janelinha "Detalhamento dos
-   Registros");
-2. Com a janelinha aberta, tecle **F12 → aba "Elementos"** (ou "Inspetor" no
-   Firefox), clique com o botão direito no elemento mais externo da
-   janelinha e escolha **"Copiar → Copiar elemento externo (outerHTML)"**;
-   cole num arquivo de texto e me mande;
-3. Faça o mesmo com um dia que **já tenha horário** lançado, para eu ver como
-   um registro preenchido aparece.
+![Sugestor em ação](../docs/v6_sugestor.png)
 
-Com esses dois pedaços eu consigo escrever e testar o preenchedor da mesma
-forma que testei o analisador.
+Uso: igual ao analisador (F12 → Console → colar → Enter).
+
+## Parte 2b — Preenchimento automático (a fazer) ⏳
+
+Falta a parte que **preenche e salva** os dias sozinha. Para construí-la com
+segurança eu preciso ver o formulário de lançamento **no modo manual** — que
+**não** está na página que você salvou, porque ele só é carregado quando você
+marca "Registro Manual de Frequência" (aí o rádio dispara um `A4J.AJAX.Submit`
+e o servidor devolve os campos de hora). Os nomes internos desses campos são
+gerados na hora (ex.: `formInclusao:j_id652`) e mudam a cada sessão, então o
+preenchedor terá que localizá-los pela estrutura.
+
+Para isso, preciso de **uma captura no modo manual**:
+
+1. Clique num dia **vazio** para abrir a janelinha "Detalhamento dos Registros";
+2. Marque **"Registro Manual de Frequência"** (aí aparecem os campos
+   Entrada/Início e Saída/Término);
+3. Tecle **F12 → aba "Elementos"** (ou "Inspetor" no Firefox), clique com o
+   botão direito no elemento mais externo da janelinha (o `div` do
+   "Detalhamento dos Registros") e escolha
+   **"Copiar → Copiar elemento externo (outerHTML)"**;
+4. Cole num arquivo de texto (Bloco de Notas) e me mande.
+
+Com esse pedaço eu escrevo e testo o preenchedor da mesma forma que testei o
+analisador e o sugestor.
 
 ### Por que um userscript, e não continuar no .exe?
 
