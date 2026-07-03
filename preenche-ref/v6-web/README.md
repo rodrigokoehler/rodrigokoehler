@@ -71,8 +71,11 @@ duplas e saídas cedo demais).
 
 ![Sugestor em ação](../docs/v6_sugestor.png)
 
-Uso: igual ao analisador (F12 → Console → colar → Enter). Para o mês de abril,
-basta abrir abril no REF e colar — ele lê o mês/ano da própria tela.
+Uso: igual ao analisador (F12 → Console → colar → Enter). Ele lê o mês/ano da
+própria tela e **respeita as marcações "(F)" (feriado) e "(PF)" (ponto
+facultativo)** que o REF mostra ao lado do dia, além de calcular os feriados.
+O `CONFIG` que acompanha o arquivo já vem para o padrão pedido: **com almoço e
+com desporto fixo 20:00–21:00**, entrada ≥10:00, total 09:01–09:11.
 
 ## Parte 2b — Preenchimento automático (a fazer) ⏳
 

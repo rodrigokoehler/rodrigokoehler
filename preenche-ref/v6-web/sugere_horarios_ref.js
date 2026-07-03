@@ -31,16 +31,18 @@
    * Horários no formato "HHMM" (quatro dígitos). Ajuste à vontade.
    */
   var CONFIG = {
-    comAlmoco:    false,    // false = sem intervalo de almoço (um par por dia)
-    comDesporto:  false,    // false = sem prática desportiva
-    entradaManha: "1000",   // base da entrada (dias vazios)
-    saidaAlmoco:  "1300",   // usado só se comAlmoco = true
-    voltaAlmoco:  "1400",   // usado só se comAlmoco = true
-    desportoIni:  "2000",   // usado só se comDesporto = true
+    comAlmoco:    true,     // true = com intervalo de almoço
+    comDesporto:  true,     // true = com prática desportiva
+    entradaManha: "1000",   // base da entrada
+    saidaAlmoco:  "1300",   // saída para o almoço (usado se comAlmoco)
+    voltaAlmoco:  "1400",   // volta do almoço (usado se comAlmoco)
+    desportoIni:  "2000",   // início do desporto (usado se comDesporto)
+    desportoFim:  "2100",   // fim do desporto — fixo (8h às 9h da noite)
     minEntrada:   "1000",   // entrada nunca antes disto
-    totalMin:     "0901",   // menor total do dia (HHMM)
+    totalMin:     "0901",   // menor total do dia, incluindo o desporto (HHMM)
     totalMax:     "0911",   // maior total do dia (HHMM)
-    variacaoMin:  8         // variação máxima, em minutos, na posição
+    variacaoMin:  8,        // variação máx., em minutos, na posição (não no desporto)
+    pularPontoFacultativo: true  // pular dias marcados "(PF)" na tela?
   };
 
   // -------- utilidades de tempo (minutos desde a meia-noite) -----------------
@@ -129,7 +131,11 @@
     achaLinhasDeDia().forEach(function (L) {
       var ddmm = ("0" + L.dia).slice(-2) + "/" + ("0" + ma.mes).slice(-2);
       var fds = L.nome.indexOf("bado") >= 0 || L.nome.indexOf("domingo") >= 0;
-      if (fds || feriados[ddmm]) return;                    // pula fim de semana/feriado
+      // a própria tela marca "(F)" = feriado e "(PF)" = ponto facultativo
+      var marcaPF = /\(pf\)/.test(L.nome);
+      var marcaF = /\(f\)/.test(L.nome);
+      if (fds || feriados[ddmm] || marcaF) return;          // pula fim de semana/feriado
+      if (marcaPF && CONFIG.pularPontoFacultativo) return;  // pula ponto facultativo
       var nE = L.entradas.length, nS = L.saidas.length;
 
       // já completo (tem entrada e saída) -> nada a fazer
@@ -195,7 +201,8 @@
   function calculaComBlocos(minEnt, totMin, totMax, ultimo) {
     var jit = CONFIG.variacaoMin;
     var e1b = hmParaMin(CONFIG.entradaManha), s1b = hmParaMin(CONFIG.saidaAlmoco), e2b = hmParaMin(CONFIG.voltaAlmoco);
-    var durManha = s1b - e1b, almoco = e2b - s1b, despDur = CONFIG.comDesporto ? 60 : 0;
+    var durManha = s1b - e1b, almoco = e2b - s1b;
+    var despDur = CONFIG.comDesporto ? (hmParaMin(CONFIG.desportoFim) - hmParaMin(CONFIG.desportoIni)) : 0;
     for (var t = 0; t < 200; t++) {
       var e1 = e1b + sorteio(-jit, jit);
       if (e1 < minEnt) continue;
@@ -206,8 +213,9 @@
       if (s2 <= e2) continue;
       var desp = null;
       if (CONFIG.comDesporto) {
-        var de = hmParaMin(CONFIG.desportoIni) + sorteio(-jit, jit), ds = de + 60;
-        if (de <= s2 || ds > 1439) continue;
+        // desporto é FIXO (ex.: 20:00–21:00), não varia
+        var de = hmParaMin(CONFIG.desportoIni), ds = hmParaMin(CONFIG.desportoFim);
+        if (s2 >= de) continue;             // expediente não pode invadir o desporto
         desp = [de, ds];
       } else if (s2 > 1439) continue;
       return { manha: [e1, s1], tarde: [e2, s2], desporto: desp, total: tot };
