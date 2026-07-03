@@ -36,8 +36,8 @@
     entradaManha: "1000",   // base da entrada
     saidaAlmoco:  "1300",   // saída para o almoço (usado se comAlmoco)
     voltaAlmoco:  "1400",   // volta do almoço (usado se comAlmoco)
-    desportoIni:  "2000",   // início do desporto (usado se comDesporto)
-    desportoFim:  "2100",   // fim do desporto — fixo (8h às 9h da noite)
+    desportoIni:  "0800",   // início do desporto (usado se comDesporto)
+    desportoFim:  "0900",   // fim do desporto — fixo (08:00 às 09:00)
     minEntrada:   "1000",   // entrada nunca antes disto
     totalMin:     "0901",   // menor total do dia, incluindo o desporto (HHMM)
     totalMax:     "0911",   // maior total do dia (HHMM)
@@ -210,14 +210,14 @@
       var tot = sorteio(totMin, totMax);
       if (tot % 60 === 0 || tot === ultimo) continue;
       var s2 = e2 + (tot - despDur - durManha);
-      if (s2 <= e2) continue;
+      if (s2 <= e2 || s2 > 1439) continue;
       var desp = null;
       if (CONFIG.comDesporto) {
-        // desporto é FIXO (ex.: 20:00–21:00), não varia
+        // desporto é FIXO (ex.: 08:00–09:00) — não pode sobrepor manhã nem tarde
         var de = hmParaMin(CONFIG.desportoIni), ds = hmParaMin(CONFIG.desportoFim);
-        if (s2 >= de) continue;             // expediente não pode invadir o desporto
+        if (!(ds <= e1 || de >= s1) || !(ds <= e2 || de >= s2)) continue;
         desp = [de, ds];
-      } else if (s2 > 1439) continue;
+      }
       return { manha: [e1, s1], tarde: [e2, s2], desporto: desp, total: tot };
     }
     return null;

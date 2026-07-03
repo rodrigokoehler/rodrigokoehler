@@ -75,7 +75,7 @@ Uso: igual ao analisador (F12 → Console → colar → Enter). Ele lê o mês/a
 própria tela e **respeita as marcações "(F)" (feriado) e "(PF)" (ponto
 facultativo)** que o REF mostra ao lado do dia, além de calcular os feriados.
 O `CONFIG` que acompanha o arquivo já vem para o padrão pedido: **com almoço e
-com desporto fixo 20:00–21:00**, entrada ≥10:00, total 09:01–09:11.
+com desporto fixo 08:00–09:00**, entrada ≥10:00, total 09:01–09:11.
 
 ## Parte 2b — Preenchimento automático (a fazer) ⏳
 

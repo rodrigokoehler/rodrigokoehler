@@ -26,7 +26,7 @@
   // ------- config (igual ao sugestor de abril) -------
   var CONFIG = {
     entradaManha: "1000", saidaAlmoco: "1300", voltaAlmoco: "1400",
-    desportoIni: "2000", desportoFim: "2100",
+    desportoIni: "0800", desportoFim: "0900",
     minEntrada: "1000", totalMin: "0901", totalMax: "0911", variacaoMin: 8
   };
   function hm(s) { return parseInt(s.slice(0, 2), 10) * 60 + parseInt(s.slice(2), 10); }
@@ -58,11 +58,11 @@
       var s1 = e1 + durManha, e2 = s1 + almoco;
       var tot = rnd(totMin, totMax); if (tot % 60 === 0) continue;
       var s2 = e2 + (tot - despDur - durManha);
-      if (s2 <= e2 || s2 >= hm(CONFIG.desportoIni)) continue;
-      return {
-        manha: [e1, s1], tarde: [e2, s2],
-        desporto: [hm(CONFIG.desportoIni), hm(CONFIG.desportoFim)], total: tot
-      };
+      if (s2 <= e2 || s2 > 1439) continue;
+      var di = hm(CONFIG.desportoIni), df = hm(CONFIG.desportoFim);
+      // desporto (fixo) não pode sobrepor manhã nem tarde
+      if (!(df <= e1 || di >= s1) || !(df <= e2 || di >= s2)) continue;
+      return { manha: [e1, s1], tarde: [e2, s2], desporto: [di, df], total: tot };
     }
     return null;
   }
