@@ -79,19 +79,65 @@
     }
   }
 
+  // ------- (desporto) acha o <select> de Ocorrência (tem "Prática desportiva") -------
+  function selectOcorrencia() {
+    var sels = document.querySelectorAll("select");
+    for (var i = 0; i < sels.length; i++) {
+      var r = sels[i].getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+      for (var o = 0; o < sels[i].options.length; o++) {
+        if (/pr[aá]tica\s+desportiva/i.test(sels[i].options[o].text)) return sels[i];
+      }
+    }
+    return null;
+  }
+
+  // espera (polling) até a condição virar verdadeira, então chama cb
+  function espera(cond, cb, tentativas) {
+    tentativas = tentativas == null ? 20 : tentativas;
+    var r = cond();
+    if (r) return cb(r);
+    if (tentativas <= 0) return cb(null);
+    setTimeout(function () { espera(cond, cb, tentativas - 1); }, 150);
+  }
+
+  // preenche um par nos campos de hora VISÍVEIS (manhã/tarde no modo manual)
   function preenchePar(par) {
     var c = camposHora();
     if (c.length < 2) {
       alert("Não achei os dois campos de hora. A janelinha está aberta em 'Registro Manual de Frequência'?");
       return;
     }
-    setHora(c[0], mp(par[0]));   // Entrada/Início
-    setHora(c[1], mp(par[1]));   // Saída/Término
+    setHora(c[0], mp(par[0]));
+    setHora(c[1], mp(par[1]));
+  }
+
+  // desporto: seleciona "Prática desportiva" na Ocorrência e preenche os horários
+  function preencheDesporto(par) {
+    var sel = selectOcorrencia();
+    if (!sel) {
+      alert("Para o desporto, marque primeiro a bolinha 'Ocorrência' na janelinha (aí aparece a lista com 'Prática desportiva').");
+      return;
+    }
+    var opt = null;
+    for (var o = 0; o < sel.options.length; o++) {
+      if (/pr[aá]tica\s+desportiva/i.test(sel.options[o].text)) { opt = sel.options[o]; break; }
+    }
+    if (!opt) { alert("Não achei 'Prática desportiva' na lista."); return; }
+    if (window.jQuery) window.jQuery(sel).val(opt.value).trigger("change");
+    else { sel.value = opt.value; sel.dispatchEvent(new Event("change", { bubbles: true })); }
+    // após escolher, os campos de hora podem (re)aparecer via AJAX — espera e preenche
+    espera(function () { var c = camposHora(); return c.length >= 2 ? c : null; }, function (c) {
+      if (!c) { alert("Os campos de hora do desporto não apareceram. Selecione 'Prática desportiva' e tente de novo."); return; }
+      setHora(c[0], mp(par[0]));
+      setHora(c[1], mp(par[1]));
+    });
   }
 
   // ------- painel -------
-  function botao(rot, par, cor) {
-    return "<button data-e='" + par[0] + "' data-s='" + par[1] + "' style='display:block;width:100%;margin:3px 0;" +
+  function botao(rot, par, cor, tipo) {
+    return "<button data-e='" + par[0] + "' data-s='" + par[1] + "'" +
+      (tipo ? " data-tipo='" + tipo + "'" : "") + " style='display:block;width:100%;margin:3px 0;" +
       "padding:6px;background:" + cor + ";border:1px solid #999;border-radius:4px;cursor:pointer;text-align:left'>" +
       "<b>" + rot + "</b>: " + mp(par[0]) + " – " + mp(par[1]) + "</button>";
   }
@@ -110,14 +156,18 @@
         (dia ? dia.num : "?") + "</b>  <span style='font-size:11px;color:#666'>total " +
         (d ? Math.floor(d.total / 60) + "h" + ("0" + d.total % 60).slice(-2) : "?") + "</span></div>" +
       (d ? botao("Manhã", d.manha, "#e8f5e9") + botao("Tarde", d.tarde, "#e8f5e9") +
-           botao("Desporto (via Ocorrência)", d.desporto, "#fff3e0") : "<div>erro no cálculo</div>") +
+           botao("Desporto (Prática desportiva)", d.desporto, "#fff3e0", "desporto") : "<div>erro no cálculo</div>") +
       "<div style='font-size:11px;color:#777;margin-top:6px'>Clique num turno → confere os campos → clique <b>Salvar</b> na janelinha.<br>" +
       "Desporto é 'Ocorrência': por ora lance à mão. Nada é salvo por este script.</div>" +
       "<div style='margin-top:6px'><button id='ppOutro'>Outro sorteio</button> <button id='ppFecha'>Fechar</button></div>";
     document.body.appendChild(div);
 
     Array.prototype.forEach.call(div.querySelectorAll("button[data-e]"), function (b) {
-      b.onclick = function () { preenchePar([parseInt(b.getAttribute("data-e"), 10), parseInt(b.getAttribute("data-s"), 10)]); };
+      b.onclick = function () {
+        var par = [parseInt(b.getAttribute("data-e"), 10), parseInt(b.getAttribute("data-s"), 10)];
+        if (b.getAttribute("data-tipo") === "desporto") preencheDesporto(par);
+        else preenchePar(par);
+      };
     });
     document.getElementById("ppFecha").onclick = function () { div.remove(); };
     document.getElementById("ppOutro").onclick = function () { render(); };
