@@ -16,7 +16,7 @@ Gui, Color,
 Gui +LastFound
 WinSet, TransColor, FFFFA7
 Gui, Font, underline
-Gui, Add, Button, x+260 y+3 w90 h24 hwndIcon6 , &Versão_5.1
+Gui, Add, Button, x+260 y+3 w90 h24 hwndIcon6 , &Versão_5.2
 Gui, Font, norm
 Gui, Add, Text, xm vTexto, • Somente executar no navegador: Google Chrome e Mozilla Firefox
 Gui, Add, Text,xm , • Final de semana e feriados não serão preenchidos (serão pulados).
@@ -26,11 +26,11 @@ Gui, Add, Radio, x+5 vSemdesporto %Semdesporto% gRadioB, Sem prát. desportiva
 Gui, Add, Radio, x+5 vSodesporto %Sodesporto% gRadioB, Só prát. desportiva
 Gui, Add, GroupBox, xm r8 w350, Horário expediente
 Gui, Add, Text, xp+%const% yp+15 , Entrada expediente / Saída almoço
-Gui, Add, Edit, w60 vEntrada number limit4, 0900
-Gui, Add, Edit, x+%const% w60 vSaida1 number limit4, 1200
+Gui, Add, Edit, w60 vEntrada number limit4, 1000
+Gui, Add, Edit, x+%const% w60 vSaida1 number limit4, 1300
 Gui, Add, Text, xp-120 yp+30, Volta do almoço / Saída expediente
-Gui, Add, Edit, w60 vEntrada2 number limit4, 1300
-Gui, Add, Edit, x+%const% w60 vSaida2 number limit4, 1700
+Gui, Add, Edit, w60 vEntrada2 number limit4, 1400
+Gui, Add, Edit, x+%const% w60 vSaida2 number limit4, 1800
 Gui, Add, Checkbox, xp-170 yp+30 vSteamAPIToggle %SteamApiToggle% gBOX, Inserir '&Observação / Justificativa'
 Gui, Add, Edit, Disabled xp  yp+20 w320 vObs limit200,
 Gui, Add, GroupBox, xm r5 w350, Horário da prática desportiva
@@ -51,11 +51,14 @@ Gui, Add, Edit, w40 x+5 vJitterMax number limit2
 Gui, Add, UpDown, Range1-30, 8
 Gui, Add, Text, x+5, minutos a posição dos horários (entrada e almoço).
 Gui, Add, Checkbox, Checked xm vOptT, Sortear o total de horas de cada dia entre
-Gui, Add, Edit, w45 x+5 vTotMin number limit4, 0851
+Gui, Add, Edit, w45 x+5 vTotMin number limit4, 0901
 Gui, Add, Text, x+5, e
 Gui, Add, Edit, w45 x+5 vTotMax number limit4, 0911
 Gui, Add, Text, x+5, (formato HHMM)
-Gui, Add, Text, xm+18, O sorteio nunca cai em hora exata (ex.: 0900) nem repete o total do dia anterior.
+Gui, Add, Text, xm+18, Nunca em hora exata (ex.: 0900) nem repetindo o total do dia anterior.
+Gui, Add, Checkbox, Checked xm vOptE, Nunca iniciar a entrada do expediente antes de
+Gui, Add, Edit, w45 x+5 vMinEntrada number limit4, 1000
+Gui, Add, Text, x+5, (formato HHMM)
 Gui, Add, Checkbox, xm vOpt2, Após a execução do script realizar o &bloqueio do computador.
 Gui, Add, Button,xm+36 w85 h40 hwndIcon1 ,&Avançar
 Gui, Add, Button,x+80 w85 h40 hwndIcon2 ,&Cancelar
@@ -68,11 +71,11 @@ Gui, 2:Add, Button, x+45 y+5 w85 h40 Default gButtonVoltar hwndIcon5, &Voltar
 Gui, 2:Add, Text, xm , _____________DIA 2_____________
 Gui, 2:Add, GroupBox, xm r5 w200, Horário expediente
 Gui, 2:Add, Text, xp+10 yp+15, Entrada expediente / Saída almoço
-Gui, 2:Add, Edit, w60 vEntradaB1 number limit4, 0930
-Gui, 2:Add, Edit, x+40 w60 vSaidaB1 number limit4, 1230
+Gui, 2:Add, Edit, w60 vEntradaB1 number limit4, 1015
+Gui, 2:Add, Edit, x+40 w60 vSaidaB1 number limit4, 1315
 Gui, 2:Add, Text, xp-100 yp+25 , Volta do almoço / Saída expediente
-Gui, 2:Add, Edit, w60 vEntradaB2 number limit4, 1315
-Gui, 2:Add, Edit, x+40 w60 vSaidaB2 number limit4, 1715
+Gui, 2:Add, Edit, w60 vEntradaB2 number limit4, 1415
+Gui, 2:Add, Edit, x+40 w60 vSaidaB2 number limit4, 1815
 Gui, 2:Add, GroupBox, xm r3 w200, Horário da prática desportiva
 Gui, 2:Add, Text, xp+10 yp+15 , Desporto entrada / Desporto saída
 Gui, 2:Add, Edit, w60 vEntradaB3 %Completo% %Sodesporto% gRadioB number limit4, 0800
@@ -80,11 +83,11 @@ Gui, 2:Add, Edit, x+40 w60 vSaidaB3 number limit4, 0900
 Gui, 2:Add, Text, xm , _____________DIA 3_____________
 Gui, 2:Add, GroupBox, xm r5 w200, Horário expediente
 Gui, 2:Add, Text, xp+10 yp+15 , Entrada expediente / Saída almoço
-Gui, 2:Add, Edit,  w60 vEntradaC1 number limit4, 0915
-Gui, 2:Add, Edit, x+40 w60 vSaidaC1 number limit4, 1215
+Gui, 2:Add, Edit,  w60 vEntradaC1 number limit4, 1030
+Gui, 2:Add, Edit, x+40 w60 vSaidaC1 number limit4, 1330
 Gui, 2:Add, Text, xp-100 yp+25 , Volta do almoço / Saída expediente
-Gui, 2:Add, Edit, w60 vEntradaC2 number limit4, 1330
-Gui, 2:Add, Edit, x+40 w60 vSaidaC2 number limit4, 1730
+Gui, 2:Add, Edit, w60 vEntradaC2 number limit4, 1430
+Gui, 2:Add, Edit, x+40 w60 vSaidaC2 number limit4, 1830
 Gui, 2:Add, GroupBox, xm r3 w200, Horário da prática desportiva
 Gui, 2:Add, Text, xp+10 yp+15 , Desporto entrada / Desporto saída
 Gui, 2:Add, Edit, w60 vEntradaC3 number limit4, 0730
@@ -94,11 +97,11 @@ Gui, 2:Add, Button, x+15 w85 h40 gButtonEncerrar hwndIcon4, &Encerrar
 GuiButtonIcon(Icon3, "shell32.dll", 138, "s32 a0 l2")
 GuiButtonIcon(Icon4, "shell32.dll", 110, "s32 a0 l2")
 GuiButtonIcon(Icon5, "shell32.dll", 239, "s32 a0 l2")
-Gui, 3:Add, Edit, x12 y89 w320 h230 +ReadOnly, Versão 5.1:`n• Sorteio do total de horas de cada dia dentro de uma faixa (padrão 08:51 a 09:11) — nunca em hora exata nem repetindo o dia anterior`n• A saída do expediente é ajustada para fechar o total sorteado`n`nVersão 5.0:`n• Feriados móveis (Carnaval; Sexta-feira Santa; Corpus Christi) calculados automaticamente para qualquer ano — antes a lista fixa ia só até 2025`n• Variação aleatória de alguns minutos na posição dos horários`n• Progresso do preenchimento exibido (dia X de Y)`n• Correções de textos`n`nVersão 4.2:`n• Ajuste para selecionar a 'Prática desportiva'`n`nVersão 4.1:`n• Preenchimento com exceção da atividade física`n`nVersão 4.0:`n• Só atividade física; novo formato de data; novo layout`n`nVersões 3.x:`n• Observação/Justificativa; feriados pulados
+Gui, 3:Add, Edit, x12 y89 w320 h230 +ReadOnly, Versão 5.2:`n• Entrada do expediente nunca antes de um mínimo (padrão 10:00)`n• Total diário padrão de 09:01 a 09:11 (sempre acima de 9h)`n`nVersão 5.1:`n• Sorteio do total de horas de cada dia — nunca em hora exata nem repetindo o dia anterior; a saída fecha o total`n`nVersão 5.0:`n• Feriados móveis calculados para qualquer ano (antes: lista fixa até 2025)`n• Variação aleatória da posição dos horários`n• Progresso (dia X de Y) e correções de texto`n`nVersões anteriores: ver README do projeto
 Gui, 3:Add, Button, x232 y329 w100 h30 gOK Default, &OK
 Gui, 3:Font, Bold
 Gui, 3:Add, Text, x92 y9 w140 h20 , Preenche REF
-Gui, 3:Add, Text, x92 y29 w140 h20 , v. 5.1.0
+Gui, 3:Add, Text, x92 y29 w140 h20 , v. 5.2.0
 Gui, 3:Font
 SysIcons := A_WinDir . "\system32\SHELL32.dll"
 Gui, 3:Add, Picture, x12 y9 w70 h70 Icon21, %SysIcons%
@@ -209,7 +212,7 @@ GuiControl, Hide, Obs2
 }
 }
 return
-ButtonVersão_5.1:
+ButtonVersão_5.2:
 {
 Gui, 3:Show, Center w348 h370, Preenche REF - Versões
 permiteMsg := false
@@ -246,6 +249,22 @@ totMax := SubStr(TotMax, 1, 2)*60 + SubStr(TotMax, 3, 2)
 if (totMin >= totMax)
 {
 MsgBox 0x30, ATENÇÃO, O total mínimo do sorteio deve ser menor que o total máximo.
+Gui 1:Show
+return
+}
+}
+minEAtivo := (OptE = 1) ? 1 : 0
+if (minEAtivo = 1)
+{
+if not ehNum_Forma(MinEntrada)
+{
+Gui 1:Show
+return
+}
+minEMin := SubStr(MinEntrada, 1, 2)*60 + SubStr(MinEntrada, 3, 2)
+if (Sodesporto = 0 and HmParaMin(Entrada) < minEMin)
+{
+MsgBox 0x30, ATENÇÃO, A entrada do expediente não pode ser anterior ao mínimo configurado.
 Gui 1:Show
 return
 }
@@ -541,8 +560,7 @@ return
 }
 else
 {
-toltip := round(espera / 1000)
-MsgBox 0x40, Preenche REF, Após essa mensagem ative em %toltip% segundos o navegador com a janela aberta no primeiro dia a ser preenchido os horários e clique na barra de títulos escrito 'Detalhamento dos Registros', e após essa ação NÃO use o mouse e NÃO use o teclado!`nQuando o script acabar aparecerá uma mensagem de concluído com o tempo decorrido.`n`nSe quiser interromper a execução do script pressione ESC a qualquer instante.
+MsgInicio()
 permiteMsg := true
 toltip2 := round(espera / 1000)
 ToolTip, Clique uma vez na barra de título 'Detalhamento dos Registros'`n`n%toltip2% segundos restantes para próxima ação...
@@ -883,6 +901,15 @@ if not validaDia3
 Gui, 2:Show
 return
 }
+if (minEAtivo = 1 and Sodesporto = 0)
+{
+if (HmParaMin(EntradaB1) < minEMin or HmParaMin(EntradaC1) < minEMin)
+{
+MsgBox 0x30, ATENÇÃO, As entradas do DIA 2 e do DIA 3 não podem ser anteriores ao mínimo configurado.
+Gui 2:Show
+return
+}
+}
 entrB1 := SubStr(EntradaB1, 1 , 2)*3600 + SubStr(EntradaB1, 3 , 2)*60
 saidB1 := SubStr(SaidaB1, 1 , 2)*3600 + SubStr(SaidaB1, 3 , 2)*60
 entrB2 := SubStr(EntradaB2, 1 , 2)*3600 + SubStr(EntradaB2, 3 , 2)*60
@@ -946,8 +973,7 @@ return
 }
 }
 }
-toltip := round(espera / 1000)
-MsgBox 0x40, Preenche REF, Após essa mensagem ative em %toltip% segundos o navegador com a janela aberta no primeiro dia a ser preenchido os horários e clique na barra de títulos escrito 'Detalhamento dos Registros', e após essa ação NÃO use o mouse e NÃO use o teclado!`nQuando o script acabar aparecerá uma mensagem de concluído com o tempo decorrido.`n`nSe quiser interromper a execução do script pressione ESC a qualquer instante.
+MsgInicio()
 permiteMsg := true
 toltip2 := round(espera / 1000)
 ToolTip, Clique uma vez na barra de título 'Detalhamento dos Registros'`n`n%toltip2% segundos restantes para próxima ação...
@@ -1587,6 +1613,12 @@ ano++
 }
 return lista
 }
+MsgInicio()
+{
+global espera
+toltip := round(espera / 1000)
+MsgBox 0x40, Preenche REF, Após essa mensagem ative em %toltip% segundos o navegador com a janela aberta no primeiro dia a ser preenchido os horários e clique na barra de títulos escrito 'Detalhamento dos Registros', e após essa ação NÃO use o mouse e NÃO use o teclado!`nQuando o script acabar aparecerá uma mensagem de concluído com o tempo decorrido.`n`nSe quiser interromper a execução do script pressione ESC a qualquer instante.
+}
 PreparaDia(s, j, usaDesp := 1)
 {
 global totAtivo, totMin, totMax, ultimoTotal
@@ -1624,6 +1656,7 @@ return s
 }
 AplicaJitter(s, j, usaDesp := 1)
 {
+global minEAtivo, minEMin
 if (j <= 0)
 return s
 Loop, 30
@@ -1644,6 +1677,8 @@ s1 := HmParaMin(SubStr(s, 5, 4)) + d1
 e2 := HmParaMin(SubStr(s, 9, 4)) + d2
 s2 := HmParaMin(SubStr(s, 13, 4)) + d2
 if (e1 < 0 or s2 > 1439 or s1 >= e2)
+continue
+if (minEAtivo = 1 and e1 < minEMin)
 continue
 novo := MinParaHm(e1) . MinParaHm(s1) . MinParaHm(e2) . MinParaHm(s2)
 if (StrLen(s) = 16)

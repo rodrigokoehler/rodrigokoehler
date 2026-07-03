@@ -83,6 +83,22 @@ MsgBox 0x30, ATENÇÃO, O total mínimo do sorteio deve ser menor que o total m�
 Gui 1:Show
 return
 }
+}
+minEAtivo := (OptE = 1) ? 1 : 0
+if (minEAtivo = 1)
+{
+if not ehNum_Forma(MinEntrada)
+{
+Gui 1:Show
+return
+}
+minEMin := SubStr(MinEntrada, 1, 2)*60 + SubStr(MinEntrada, 3, 2)
+if (Sodesporto = 0 and HmParaMin(Entrada) < minEMin)
+{
+MsgBox 0x30, ATENÇÃO, A entrada do expediente não pode ser anterior ao mínimo configurado.
+Gui 1:Show
+return
+}
 }"""
 
 OPT1_OLD = ("Gui, Add, Checkbox, Checked xm vOpt1, Inserir outros 2 (dois) dias com "
@@ -93,27 +109,27 @@ OPT1_NEW = OPT1_OLD + ("\n"
     "Gui, Add, UpDown, Range1-30, 8\n"
     "Gui, Add, Text, x+5, minutos a posição dos horários (entrada e almoço).\n"
     "Gui, Add, Checkbox, Checked xm vOptT, Sortear o total de horas de cada dia entre\n"
-    "Gui, Add, Edit, w45 x+5 vTotMin number limit4, 0851\n"
+    "Gui, Add, Edit, w45 x+5 vTotMin number limit4, 0901\n"
     "Gui, Add, Text, x+5, e\n"
     "Gui, Add, Edit, w45 x+5 vTotMax number limit4, 0911\n"
     "Gui, Add, Text, x+5, (formato HHMM)\n"
-    "Gui, Add, Text, xm+18, O sorteio nunca cai em hora exata (ex.: 0900) nem repete o total do dia anterior.")
+    "Gui, Add, Text, xm+18, Nunca em hora exata (ex.: 0900) nem repetindo o total do dia anterior.\n"
+    "Gui, Add, Checkbox, Checked xm vOptE, Nunca iniciar a entrada do expediente antes de\n"
+    "Gui, Add, Edit, w45 x+5 vMinEntrada number limit4, 1000\n"
+    "Gui, Add, Text, x+5, (formato HHMM)")
 
 CHANGELOG_NEW = ("Gui, 3:Add, Edit, x12 y89 w320 h230 +ReadOnly, "
+    "Versão 5.2:`n"
+    "• Entrada do expediente nunca antes de um mínimo (padrão 10:00)`n"
+    "• Total diário padrão de 09:01 a 09:11 (sempre acima de 9h)`n`n"
     "Versão 5.1:`n"
-    "• Sorteio do total de horas de cada dia dentro de uma faixa "
-    "(padrão 08:51 a 09:11) — nunca em hora exata nem repetindo o dia anterior`n"
-    "• A saída do expediente é ajustada para fechar o total sorteado`n`n"
+    "• Sorteio do total de horas de cada dia — nunca em hora exata nem "
+    "repetindo o dia anterior; a saída fecha o total`n`n"
     "Versão 5.0:`n"
-    "• Feriados móveis (Carnaval; Sexta-feira Santa; Corpus Christi) calculados "
-    "automaticamente para qualquer ano — antes a lista fixa ia só até 2025`n"
-    "• Variação aleatória de alguns minutos na posição dos horários`n"
-    "• Progresso do preenchimento exibido (dia X de Y)`n"
-    "• Correções de textos`n`n"
-    "Versão 4.2:`n• Ajuste para selecionar a 'Prática desportiva'`n`n"
-    "Versão 4.1:`n• Preenchimento com exceção da atividade física`n`n"
-    "Versão 4.0:`n• Só atividade física; novo formato de data; novo layout`n`n"
-    "Versões 3.x:`n• Observação/Justificativa; feriados pulados")
+    "• Feriados móveis calculados para qualquer ano (antes: lista fixa até 2025)`n"
+    "• Variação aleatória da posição dos horários`n"
+    "• Progresso (dia X de Y) e correções de texto`n`n"
+    "Versões anteriores: ver README do projeto")
 
 FUNCS = """
 Espera1()
@@ -157,6 +173,12 @@ ano++
 }
 return lista
 }
+MsgInicio()
+{
+global espera
+toltip := round(espera / 1000)
+MsgBox 0x40, Preenche REF, Após essa mensagem ative em %toltip% segundos o navegador com a janela aberta no primeiro dia a ser preenchido os horários e clique na barra de títulos escrito 'Detalhamento dos Registros', e após essa ação NÃO use o mouse e NÃO use o teclado!`nQuando o script acabar aparecerá uma mensagem de concluído com o tempo decorrido.`n`nSe quiser interromper a execução do script pressione ESC a qualquer instante.
+}
 PreparaDia(s, j, usaDesp := 1)
 {
 global totAtivo, totMin, totMax, ultimoTotal
@@ -194,6 +216,7 @@ return s
 }
 AplicaJitter(s, j, usaDesp := 1)
 {
+global minEAtivo, minEMin
 if (j <= 0)
 return s
 Loop, 30
@@ -214,6 +237,8 @@ s1 := HmParaMin(SubStr(s, 5, 4)) + d1
 e2 := HmParaMin(SubStr(s, 9, 4)) + d2
 s2 := HmParaMin(SubStr(s, 13, 4)) + d2
 if (e1 < 0 or s2 > 1439 or s1 >= e2)
+continue
+if (minEAtivo = 1 and e1 < minEMin)
 continue
 novo := MinParaHm(e1) . MinParaHm(s1) . MinParaHm(e2) . MinParaHm(s2)
 if (StrLen(s) = 16)
@@ -278,10 +303,57 @@ def main(src_path, dst_path):
                "if (h_dia != 28800 and totAtivo != 1)", 2)
     text = sub(text, "if (h_dia2 != 28800)  or  (h_dia3 != 28800)",
                "if ((h_dia2 != 28800 or h_dia3 != 28800) and totAtivo != 1)", 2)
+    # 10d. horarios padrao: entrada 10h e blocos compatíveis
+    for old, new in [
+        ("Gui, Add, Edit, w60 vEntrada number limit4, 0900",
+         "Gui, Add, Edit, w60 vEntrada number limit4, 1000"),
+        ("Gui, Add, Edit, x+%const% w60 vSaida1 number limit4, 1200",
+         "Gui, Add, Edit, x+%const% w60 vSaida1 number limit4, 1300"),
+        ("Gui, Add, Edit, w60 vEntrada2 number limit4, 1300",
+         "Gui, Add, Edit, w60 vEntrada2 number limit4, 1400"),
+        ("Gui, Add, Edit, x+%const% w60 vSaida2 number limit4, 1700",
+         "Gui, Add, Edit, x+%const% w60 vSaida2 number limit4, 1800"),
+        ("Gui, 2:Add, Edit, w60 vEntradaB1 number limit4, 0930",
+         "Gui, 2:Add, Edit, w60 vEntradaB1 number limit4, 1015"),
+        ("Gui, 2:Add, Edit, x+40 w60 vSaidaB1 number limit4, 1230",
+         "Gui, 2:Add, Edit, x+40 w60 vSaidaB1 number limit4, 1315"),
+        ("Gui, 2:Add, Edit, w60 vEntradaB2 number limit4, 1315",
+         "Gui, 2:Add, Edit, w60 vEntradaB2 number limit4, 1415"),
+        ("Gui, 2:Add, Edit, x+40 w60 vSaidaB2 number limit4, 1715",
+         "Gui, 2:Add, Edit, x+40 w60 vSaidaB2 number limit4, 1815"),
+        ("Gui, 2:Add, Edit,  w60 vEntradaC1 number limit4, 0915",
+         "Gui, 2:Add, Edit,  w60 vEntradaC1 number limit4, 1030"),
+        ("Gui, 2:Add, Edit, x+40 w60 vSaidaC1 number limit4, 1215",
+         "Gui, 2:Add, Edit, x+40 w60 vSaidaC1 number limit4, 1330"),
+        ("Gui, 2:Add, Edit, w60 vEntradaC2 number limit4, 1330",
+         "Gui, 2:Add, Edit, w60 vEntradaC2 number limit4, 1430"),
+        ("Gui, 2:Add, Edit, x+40 w60 vSaidaC2 number limit4, 1730",
+         "Gui, 2:Add, Edit, x+40 w60 vSaidaC2 number limit4, 1830"),
+    ]:
+        text = sub(text, old, new, 1)
+    # 10e. validacao das entradas do DIA 2/3 contra o minimo
+    text = sub(text,
+               "entrB1 := SubStr(EntradaB1, 1 , 2)*3600 + SubStr(EntradaB1, 3 , 2)*60",
+               "if (minEAtivo = 1 and Sodesporto = 0)\n{\n"
+               "if (HmParaMin(EntradaB1) < minEMin or HmParaMin(EntradaC1) < minEMin)\n{\n"
+               "MsgBox 0x30, ATENÇÃO, As entradas do DIA 2 e do DIA 3 não podem ser "
+               "anteriores ao mínimo configurado.\nGui 2:Show\nreturn\n}\n}\n"
+               "entrB1 := SubStr(EntradaB1, 1 , 2)*3600 + SubStr(EntradaB1, 3 , 2)*60", 1)
+    # 10f. mensagem inicial duplicada vira funcao unica (economia de espaco)
+    text = sub(text,
+               "toltip := round(espera / 1000)\n"
+               "MsgBox 0x40, Preenche REF, Após essa mensagem ative em %toltip% segundos "
+               "o navegador com a janela aberta no primeiro dia a ser preenchido os "
+               "horários e clique na barra de títulos escrito 'Detalhamento dos "
+               "Registros', e após essa ação NÃO use o mouse e NÃO use o teclado!`n"
+               "Quando o script acabar aparecerá uma mensagem de concluído com o tempo "
+               "decorrido.`n`nSe quiser interromper a execução do script pressione ESC "
+               "a qualquer instante.",
+               "MsgInicio()", 2)
     # 11. versao
-    text = sub(text, "&Versão_4.2", "&Versão_5.1", 1)
-    text = sub(text, "ButtonVersão_4.2:", "ButtonVersão_5.1:", 1)
-    text = sub(text, "v. 4.2.0", "v. 5.1.0", 1)
+    text = sub(text, "&Versão_4.2", "&Versão_5.2", 1)
+    text = sub(text, "ButtonVersão_4.2:", "ButtonVersão_5.2:", 1)
+    text = sub(text, "v. 4.2.0", "v. 5.2.0", 1)
     # 12. changelog
     text = re.sub(r"Gui, 3:Add, Edit, x12 y89 w320 h230 \+ReadOnly, [^\n]*",
                   lambda _: CHANGELOG_NEW, text, count=1)
