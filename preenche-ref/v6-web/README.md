@@ -68,16 +68,14 @@ e o servidor devolve os campos de hora). Os nomes internos desses campos são
 gerados na hora (ex.: `formInclusao:j_id652`) e mudam a cada sessão, então o
 preenchedor terá que localizá-los pela estrutura.
 
-Para isso, preciso de **uma captura no modo manual**:
+Para isso, preciso de **uma captura no modo manual**. O jeito fácil é usar o
+[`captura_modal_ref.js`](captura_modal_ref.js):
 
 1. Clique num dia **vazio** para abrir a janelinha "Detalhamento dos Registros";
-2. Marque **"Registro Manual de Frequência"** (aí aparecem os campos
-   Entrada/Início e Saída/Término);
-3. Tecle **F12 → aba "Elementos"** (ou "Inspetor" no Firefox), clique com o
-   botão direito no elemento mais externo da janelinha (o `div` do
-   "Detalhamento dos Registros") e escolha
-   **"Copiar → Copiar elemento externo (outerHTML)"**;
-4. Cole num arquivo de texto (Bloco de Notas) e me mande.
+2. Marque **"Registro Manual de Frequência"** (aparecem os campos de hora);
+3. F12 → Console, cole o `captura_modal_ref.js` e tecle Enter;
+4. Ele **baixa** o arquivo `modal_ref_manual.html` (apagando o código de
+   segurança ViewState, que não preciso ver). Me anexe esse arquivo.
 
 Com esse pedaço eu escrevo e testo o preenchedor da mesma forma que testei o
 analisador e o sugestor.
