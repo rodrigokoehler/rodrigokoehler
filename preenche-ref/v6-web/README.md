@@ -43,20 +43,36 @@ enviado — é seguro. Para analisar outro mês, navegue até ele e cole de novo
 ## Parte 2a — Sugestor de horários (pronta) ✅
 
 [`sugere_horarios_ref.js`](sugere_horarios_ref.js) roda dentro da página e,
-para cada dia útil ainda vazio, **mostra numa tabela os horários a lançar**,
-seguindo as mesmas regras da v5.2: entrada nunca antes de 10:00, total diário
-entre 09:01 e 09:11 (nunca em hora exata nem repetindo o dia anterior),
-pequena variação de posição e 1h de desporto contando no total. Não preenche
-nem envia nada — você digita, por enquanto. As opções ficam no bloco `CONFIG`
-no topo do arquivo. Há um botão **"Sortear de novo"** para gerar outra
-combinação.
+para cada dia útil que precisa de lançamento, **mostra numa tabela os horários
+a digitar**, seguindo as regras da v5.2: entrada nunca antes de 10:00, total
+diário entre 09:01 e 09:11 (nunca em hora exata nem repetindo o dia anterior),
+pequena variação de posição.
 
-Testado: 10.000 dias simulados sem violar nenhuma regra, e rodado contra a
-página real (março/2026), gerando os 8 dias vazios corretos.
+O que o torna esperto: ele **lê o que já existe** em cada dia e sugere só o que
+falta —
+
+| Situação do dia | O que sugere |
+|-----------------|--------------|
+| Vazio | entrada **e** saída |
+| Só com a saída (ponto automático) | **só a entrada** (mantém a saída existente) |
+| Só com a entrada | **só a saída** |
+| Já completo | pula |
+| Marcações duplas, ou horário que não fecha ≥10h e >9h (plantão/sobreaviso) | **não chuta** — marca "conferir à mão" |
+
+Na tabela, o valor em **negrito** é o que você digita; o cinza *(já)* é o que
+já está no sistema. Opções (com/sem almoço, com/sem desporto, faixa de total,
+mínimo de entrada) ficam no bloco `CONFIG` no topo do arquivo. Botão
+**"Sortear de novo"** gera outra combinação.
+
+Testado: validação numérica das três ramificações (dia vazio, completar
+entrada, completar saída) sem violar regra, e execução contra a página real —
+completou os dias limpos e sinalizou corretamente os ambíguos (marcações
+duplas e saídas cedo demais).
 
 ![Sugestor em ação](../docs/v6_sugestor.png)
 
-Uso: igual ao analisador (F12 → Console → colar → Enter).
+Uso: igual ao analisador (F12 → Console → colar → Enter). Para o mês de abril,
+basta abrir abril no REF e colar — ele lê o mês/ano da própria tela.
 
 ## Parte 2b — Preenchimento automático (a fazer) ⏳
 
