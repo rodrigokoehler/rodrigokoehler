@@ -16,7 +16,7 @@ Gui, Color,
 Gui +LastFound
 WinSet, TransColor, FFFFA7
 Gui, Font, underline
-Gui, Add, Button, x+260 y+3 w90 h24 hwndIcon6 , &Versão_5.0
+Gui, Add, Button, x+260 y+3 w90 h24 hwndIcon6 , &Versão_5.1
 Gui, Font, norm
 Gui, Add, Text, xm vTexto, • Somente executar no navegador: Google Chrome e Mozilla Firefox
 Gui, Add, Text,xm , • Final de semana e feriados não serão preenchidos (serão pulados).
@@ -49,7 +49,13 @@ Gui, Add, Checkbox, Checked xm vOpt1, Inserir outros 2 (dois) dias com horários
 Gui, Add, Checkbox, Checked xm vOptJ, Variar aleatoriamente até
 Gui, Add, Edit, w40 x+5 vJitterMax number limit2
 Gui, Add, UpDown, Range1-30, 8
-Gui, Add, Text, x+5, minutos os horários de cada dia (o total de horas é mantido).
+Gui, Add, Text, x+5, minutos a posição dos horários (entrada e almoço).
+Gui, Add, Checkbox, Checked xm vOptT, Sortear o total de horas de cada dia entre
+Gui, Add, Edit, w45 x+5 vTotMin number limit4, 0851
+Gui, Add, Text, x+5, e
+Gui, Add, Edit, w45 x+5 vTotMax number limit4, 0911
+Gui, Add, Text, x+5, (formato HHMM)
+Gui, Add, Text, xm+18, O sorteio nunca cai em hora exata (ex.: 0900) nem repete o total do dia anterior.
 Gui, Add, Checkbox, xm vOpt2, Após a execução do script realizar o &bloqueio do computador.
 Gui, Add, Button,xm+36 w85 h40 hwndIcon1 ,&Avançar
 Gui, Add, Button,x+80 w85 h40 hwndIcon2 ,&Cancelar
@@ -88,11 +94,11 @@ Gui, 2:Add, Button, x+15 w85 h40 gButtonEncerrar hwndIcon4, &Encerrar
 GuiButtonIcon(Icon3, "shell32.dll", 138, "s32 a0 l2")
 GuiButtonIcon(Icon4, "shell32.dll", 110, "s32 a0 l2")
 GuiButtonIcon(Icon5, "shell32.dll", 239, "s32 a0 l2")
-Gui, 3:Add, Edit, x12 y89 w320 h230 +ReadOnly, Versão 5.0:`n• Feriados móveis (Carnaval; Sexta-feira Santa; Corpus Christi) calculados automaticamente para qualquer ano — antes a lista fixa ia só até 2025`n• Opção de variação aleatória de alguns minutos nos horários de cada dia — o total de horas do dia é mantido`n• Progresso do preenchimento exibido (dia X de Y)`n• Correções de textos`n`nVersão 4.2:`n• Ajuste para selecionar a 'Prática desportiva'`n`nVersão 4.1:`n• Opção de preenchimento com exceção da atividade física`n`nVersão 4.0:`n• Opção de preenchimento só da atividade física`n• Alteração no formato da data`n• Inserção de horários de forma mais dinâmica`n• Novo layout`n`nVersões 3.x:`n• Inclusão 'Observação / Justificativa'`n• Preservação da área de trabalho`n• Feriados fixos e móveis pulados
+Gui, 3:Add, Edit, x12 y89 w320 h230 +ReadOnly, Versão 5.1:`n• Sorteio do total de horas de cada dia dentro de uma faixa (padrão 08:51 a 09:11) — nunca em hora exata nem repetindo o dia anterior`n• A saída do expediente é ajustada para fechar o total sorteado`n`nVersão 5.0:`n• Feriados móveis (Carnaval; Sexta-feira Santa; Corpus Christi) calculados automaticamente para qualquer ano — antes a lista fixa ia só até 2025`n• Variação aleatória de alguns minutos na posição dos horários`n• Progresso do preenchimento exibido (dia X de Y)`n• Correções de textos`n`nVersão 4.2:`n• Ajuste para selecionar a 'Prática desportiva'`n`nVersão 4.1:`n• Preenchimento com exceção da atividade física`n`nVersão 4.0:`n• Só atividade física; novo formato de data; novo layout`n`nVersões 3.x:`n• Observação/Justificativa; feriados pulados
 Gui, 3:Add, Button, x232 y329 w100 h30 gOK Default, &OK
 Gui, 3:Font, Bold
 Gui, 3:Add, Text, x92 y9 w140 h20 , Preenche REF
-Gui, 3:Add, Text, x92 y29 w140 h20 , v. 5.0.0
+Gui, 3:Add, Text, x92 y29 w140 h20 , v. 5.1.0
 Gui, 3:Font
 SysIcons := A_WinDir . "\system32\SHELL32.dll"
 Gui, 3:Add, Picture, x12 y9 w70 h70 Icon21, %SysIcons%
@@ -203,7 +209,7 @@ GuiControl, Hide, Obs2
 }
 }
 return
-ButtonVersão_5.0:
+ButtonVersão_5.1:
 {
 Gui, 3:Show, Center w348 h370, Preenche REF - Versões
 permiteMsg := false
@@ -227,6 +233,23 @@ global clipsaved:= ClipboardAll
 clipboard :=
 espera :=  round(Aguarda * 1000)
 jit := (OptJ = 1) ? (JitterMax + 0) : 0
+totAtivo := (OptT = 1) ? 1 : 0
+if (totAtivo = 1)
+{
+if not ehNum_Forma(TotMin) or not ehNum_Forma(TotMax)
+{
+Gui 1:Show
+return
+}
+totMin := SubStr(TotMin, 1, 2)*60 + SubStr(TotMin, 3, 2)
+totMax := SubStr(TotMax, 1, 2)*60 + SubStr(TotMax, 3, 2)
+if (totMin >= totMax)
+{
+MsgBox 0x30, ATENÇÃO, O total mínimo do sorteio deve ser menor que o total máximo.
+Gui 1:Show
+return
+}
+}
 toltip := round(espera / 1000) - 1
 ModernBrowsers := "ApplicationFrameWindow,Chrome_WidgetWin_0,Chrome_WidgetWin_1,Maxthon3Cls_MainFrm,MozillaWindowClass,Slimjet_WidgetWin_1"
 LegacyBrowsers := "IEFrame,OperaWindowClass"
@@ -444,7 +467,7 @@ else if (Completo)
 {
 h_dia := pri_turno + seg_turno + atividade
 s_dia := substr(FormatSeconds(h_dia), 1,SubStr(FormatSeconds(h_dia), 2,1) = ":" ? 4 : 5)
-if h_dia != 28800
+if (h_dia != 28800 and totAtivo != 1)
 {
 MsgBox 0x24, Preenche REF, O horário do expediente somado com a atividade física está diferente de 8 (oito) horas por dia. `nQuantidade de horas inseridas: %s_dia%`n`nDeseja continuar assim mesmo?
 IfMsgBox No,{
@@ -457,7 +480,7 @@ else If (Semdesporto)
 {
 h_dia := pri_turno + seg_turno
 s_dia := substr(FormatSeconds(h_dia), 1,SubStr(FormatSeconds(h_dia), 2,1) = ":" ? 4 : 5)
-if h_dia != 28800
+if (h_dia != 28800 and totAtivo != 1)
 {
 MsgBox 0x24, Preenche REF, O horário do expediente está diferente de 8 (oito) horas por dia. `nQuantidade de horas inseridas: %s_dia%`n`nDeseja continuar assim mesmo?
 IfMsgBox No,{
@@ -563,7 +586,7 @@ baseEscolhido := DesportoE . DesportoS
 global time1:=A_Now
 while(i < diferenca)
 {
-escolhido := AplicaJitter(baseEscolhido, jit)
+escolhido := PreparaDia(baseEscolhido, jit)
 progresso := "Preenchendo " . corrente . " (dia " . (i+1) . " de " . diferenca . ")"
 if Diasemana(corrente) = 7 or else Diasemana(corrente) = 1 or else hasValue(myArray2, substr(corrente,1,5)) or else hasValue(myArray3, corrente)
 {
@@ -627,7 +650,7 @@ baseEscolhido := Entrada . Saida1 . Entrada2 . Saida2 . DesportoE . DesportoS
 global time1:=A_Now
 while(i < diferenca)
 {
-escolhido := AplicaJitter(baseEscolhido, jit, Completo)
+escolhido := PreparaDia(baseEscolhido, jit, Completo)
 progresso := "Preenchendo " . corrente . " (dia " . (i+1) . " de " . diferenca . ")"
 if Diasemana(corrente) = 7 or else Diasemana(corrente) = 1 or else hasValue(myArray2, substr(corrente,1,5)) or else hasValue(myArray3, corrente)
 {
@@ -884,7 +907,7 @@ h_dia3 := pri_turnoC + seg_turnoC + atividadeC
 s_dia3 := substr(FormatSeconds(h_dia3), 1,SubStr(FormatSeconds(h_dia3), 2,1) = ":" ? 4 : 5)
 if (Completo)
 {
-if (h_dia2 != 28800)  or  (h_dia3 != 28800)
+if ((h_dia2 != 28800 or h_dia3 != 28800) and totAtivo != 1)
 {
 MsgBox 0x24, Preenche REF, O horário do expediente somado com a atividade física está diferente de 8 (oito) horas por dia. `nQuantidade de horas inseridas no DIA 2: %s_dia2%`nQuantidade de horas inseridas no DIA 3: %s_dia3%`n`nDeseja continuar assim mesmo?
 IfMsgBox No,{
@@ -914,7 +937,7 @@ h_dia2 :=  pri_turnoB + seg_turnoB
 s_dia2 := substr(FormatSeconds(h_dia2), 1,SubStr(FormatSeconds(h_dia2), 2,1) = ":" ? 4 : 5)
 h_dia3 := pri_turnoC + seg_turnoC
 s_dia3 := substr(FormatSeconds(h_dia3), 1,SubStr(FormatSeconds(h_dia3), 2,1) = ":" ? 4 : 5)
-if (h_dia2 != 28800)  or  (h_dia3 != 28800)
+if ((h_dia2 != 28800 or h_dia3 != 28800) and totAtivo != 1)
 {
 MsgBox 0x24, Preenche REF, O horário do expediente está diferente de 8 (oito) horas por dia. `nQuantidade de horas inseridas no DIA 2: %s_dia2%`nQuantidade de horas inseridas no DIA 3: %s_dia3%`n`nDeseja continuar assim mesmo?
 IfMsgBox No,{
@@ -980,7 +1003,7 @@ else
 {
 escolhido := EntradaC3 . SaidaC3
 }
-escolhido := AplicaJitter(escolhido, jit)
+escolhido := PreparaDia(escolhido, jit)
 progresso := "Preenchendo " . corrente . " (dia " . (i+1) . " de " . diferenca . ")"
 if Diasemana(corrente) = 7 or else Diasemana(corrente) = 1 or else hasValue(myArray2, substr(corrente,1,5)) or else hasValue(myArray3, corrente)
 {
@@ -1055,7 +1078,7 @@ else
 {
 escolhido := EntradaC1 . SaidaC1 . EntradaC2 . SaidaC2 . EntradaC3 . SaidaC3
 }
-escolhido := AplicaJitter(escolhido, jit, Completo)
+escolhido := PreparaDia(escolhido, jit, Completo)
 progresso := "Preenchendo " . corrente . " (dia " . (i+1) . " de " . diferenca . ")"
 if Diasemana(corrente) = 7 or else Diasemana(corrente) = 1 or else hasValue(myArray2, substr(corrente,1,5)) or else hasValue(myArray3, corrente)
 {
@@ -1563,6 +1586,41 @@ lista.Push(feriado)
 ano++
 }
 return lista
+}
+PreparaDia(s, j, usaDesp := 1)
+{
+global totAtivo, totMin, totMax, ultimoTotal
+s := AplicaJitter(s, j, usaDesp)
+if (totAtivo != 1 or StrLen(s) = 8)
+return s
+e1 := HmParaMin(SubStr(s, 1, 4))
+s1 := HmParaMin(SubStr(s, 5, 4))
+e2 := HmParaMin(SubStr(s, 9, 4))
+s2 := HmParaMin(SubStr(s, 13, 4))
+desp := 0
+if (StrLen(s) = 24 and usaDesp)
+desp := HmParaMin(SubStr(s, 21, 4)) - HmParaMin(SubStr(s, 17, 4))
+Loop, 40
+{
+Random, alvo, %totMin%, %totMax%
+if (Mod(alvo, 60) = 0 or alvo = ultimoTotal)
+continue
+novoS2 := e2 + alvo - desp - (s1 - e1)
+if (novoS2 <= e2 or novoS2 > 1439)
+continue
+if (StrLen(s) = 24 and usaDesp)
+{
+e3 := HmParaMin(SubStr(s, 17, 4))
+s3 := HmParaMin(SubStr(s, 21, 4))
+if !(e3 > novoS2 or s3 < e2)
+continue
+}
+ultimoTotal := alvo
+if (StrLen(s) = 24)
+return MinParaHm(e1) . MinParaHm(s1) . MinParaHm(e2) . MinParaHm(novoS2) . SubStr(s, 17, 8)
+return MinParaHm(e1) . MinParaHm(s1) . MinParaHm(e2) . MinParaHm(novoS2)
+}
+return s
 }
 AplicaJitter(s, j, usaDesp := 1)
 {
