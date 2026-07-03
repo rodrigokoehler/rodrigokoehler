@@ -87,16 +87,21 @@ e o servidor devolve os campos de hora). Os nomes internos desses campos são
 gerados na hora (ex.: `formInclusao:j_id652`) e mudam a cada sessão, então o
 preenchedor terá que localizá-los pela estrutura.
 
-Para isso, preciso de **uma captura no modo manual**. O jeito fácil é usar o
-[`captura_modal_ref.js`](captura_modal_ref.js):
+Para isso, preciso ver os campos do **modo manual**. Como o REF é servido por
+HTTP, o Chrome **bloqueia downloads** (o `captura_modal_ref.js` cai nisso), então
+o jeito robusto é o [`inspeciona_modal.js`](inspeciona_modal.js), que **não baixa
+nada** — mostra os campos numa caixa de texto para copiar e colar:
 
 1. Clique num dia **vazio** para abrir a janelinha "Detalhamento dos Registros";
 2. Marque **"Registro Manual de Frequência"** (aparecem os campos de hora);
-3. F12 → Console, cole o `captura_modal_ref.js` e tecle Enter;
-4. Ele **baixa** o arquivo `modal_ref_manual.html` (apagando o código de
-   segurança ViewState, que não preciso ver). Me anexe esse arquivo.
+3. F12 → Console, cole o `inspeciona_modal.js` e tecle Enter;
+4. Surge uma caixa no canto superior **esquerdo** com o texto **já selecionado**
+   — tecle **Ctrl+C** e cole o conteúdo na conversa.
 
-Com esse pedaço eu escrevo e testo o preenchedor da mesma forma que testei o
+O `captura_modal_ref.js` (download do HTML inteiro) fica como alternativa para
+quando o REF estiver em HTTPS.
+
+Com esse texto eu escrevo e testo o preenchedor da mesma forma que testei o
 analisador e o sugestor.
 
 ### Por que um userscript, e não continuar no .exe?
